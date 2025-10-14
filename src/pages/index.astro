@@ -5,15 +5,7 @@ import Slider2 from '../components/home-slider/slider-2.astro';
 import Slider3 from '../components/home-slider/slider-3.astro';
 import '../styles/global.css';
 
-// Server-side string approach to eliminate blinking - render only one slider
-const backgrounds = ['slider-1', 'slider-2', 'slider-3'];
-// High-entropy server-side randomization with string manipulation for true randomness
-const timestamp = Date.now();
-const timeString = timestamp.toString().split('').reverse().join('');
-const entropy = Math.floor(Math.random() * timestamp * 3.14159);
-const combinedSeed = Number(`1${timeString.slice(-6)}${entropy.toString().slice(-3)}`.slice(-8));
-const selectedIndex = combinedSeed % backgrounds.length;
-const selectedSlider = backgrounds[selectedIndex];
+// Client-side randomization for slider selection
 ---
 
 <!DOCTYPE html>
@@ -140,30 +132,37 @@ const selectedSlider = backgrounds[selectedIndex];
 
   <body class="min-h-screen overflow-x-hidden" style="margin: 0; padding: 0; width: 100%; height: 100vh;">
     <!-- Noise overlay -->
-    <div class="noise-overlay"></div>
+    <!-- <div class="noise-overlay"></div> -->
     
     <Header />
     
-    <!-- Background sliders - Server-side string-based selection (no blinking) -->
-    {selectedSlider === 'slider-1' && (
-      <div id="slider-1-background" class="slider-background show">
-        <Slider1 />
-      </div>
-    )}
-    {selectedSlider === 'slider-2' && (
-      <div id="slider-2-background" class="slider-background show">
-        <Slider2 />
-      </div>
-    )}
-    {selectedSlider === 'slider-3' && (
-      <div id="slider-3-background" class="slider-background show">
-        <Slider3 />
-      </div>
-    )}
+    <!-- Background sliders - All sliders included, JS will show one randomly -->
+    <div id="slider-1-background" class="slider-background" style="display: none;">
+      <Slider1 />
+    </div>
+    <div id="slider-2-background" class="slider-background" style="display: none;">
+      <Slider2 />
+    </div>
+    <div id="slider-3-background" class="slider-background" style="display: none;">
+      <Slider3 />
+    </div>
     
     <script>
-      // Store selected slider for debugging 
-      sessionStorage.setItem('selectedSlider', `{selectedSlider}`);
+      // Client-side randomization - happens on every page load/refresh
+      const sliders = ['slider-1', 'slider-2', 'slider-3'];
+      const randomIndex = Math.floor(Math.random() * sliders.length);
+      const selectedSlider = sliders[randomIndex];
+      
+      // Show the selected slider
+      const sliderElement = document.getElementById(`${selectedSlider}-background`);
+      if (sliderElement) {
+        sliderElement.style.display = 'block';
+        sliderElement.classList.add('show');
+      }
+      
+      // Store for debugging
+      sessionStorage.setItem('selectedSlider', selectedSlider);
+      console.log('Selected slider:', selectedSlider);
     </script>
   </body>
 </html>
