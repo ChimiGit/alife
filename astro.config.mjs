@@ -7,8 +7,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   integrations: [react()],
   output: 'static',
-  site: process.env.PUBLIC_SITE_URL || 'https://alife.institute',
-  base: process.env.PUBLIC_BASE_PATH || '',
+  site: 'https://chimigit.github.io',
+  base: '/alife',
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ja'],
