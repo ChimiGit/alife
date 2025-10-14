@@ -75,13 +75,35 @@ The project uses Astro Content Collections for organized content management:
    pnpm install
    ```
 
-3. **Start development server**
+3. **Configure environment variables**
+
+   Copy `.env.example` to `.env` and customize:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Edit `.env`:
+
+   ```env
+   # For GitHub Pages with subpath
+   PUBLIC_BASE_PATH=/alife
+   PUBLIC_SITE_URL=https://alife.institute
+
+   # For custom domain (root deployment)
+   PUBLIC_BASE_PATH=
+   PUBLIC_SITE_URL=https://yourdomain.com
+   ```
+
+   📖 See [BASE_PATH_GUIDE.md](./BASE_PATH_GUIDE.md) for detailed configuration options.
+
+4. **Start development server**
 
    ```bash
    pnpm dev
    ```
 
-4. **Build for production**
+5. **Build for production**
    ```bash
    pnpm build
    ```

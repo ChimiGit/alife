@@ -17,9 +17,10 @@ export interface TeamMember {
 export async function getAllTeamMembers(): Promise<TeamMember[]> {
   try {
     const team = await getCollection('team');
+    const baseUrl = import.meta.env.BASE_URL || '';
     return team.map(member => ({
       ...member.data,
-      image: `${import.meta.env.BASE_URL}${member.data.image.replace(/^\//, '')}`,
+      image: `${baseUrl}${member.data.image.replace(/^\//, '')}`,
       slug: member.slug,
     }));
   } catch (error) {
@@ -38,9 +39,10 @@ export async function getTeamMemberBySlug(
       return null;
     }
 
+    const baseUrl = import.meta.env.BASE_URL || '';
     return {
       ...member.data,
-      image: `${import.meta.env.BASE_URL}${member.data.image.replace(/^\//, '')}`,
+      image: `${baseUrl}${member.data.image.replace(/^\//, '')}`,
       slug: member.slug,
     };
   } catch (error) {
