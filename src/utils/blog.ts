@@ -20,12 +20,16 @@ function getAllBlogs(): Blog[] {
     .filter(dirent => dirent.isFile() && dirent.name.endsWith('.md'))
     .map(dirent => dirent.name);
 
+  const baseUrl = import.meta.env.BASE_URL || '';
+
   const blogs: Blog[] = blogFiles.map(filename => {
     const filePath = join(blogsDirectory, filename);
     const fileContents = readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContents);
 
     const slug = filename.replace(/\.md$/, '');
+    const defaultImage = '/assets/images/Blog Loading.png';
+    const featuredImage = data.featuredImage || defaultImage;
 
     return {
       title: data.title,
@@ -36,7 +40,7 @@ function getAllBlogs(): Blog[] {
       slug,
       category: data.category || 'General',
       tags: data.tags || [],
-      featuredImage: data.featuredImage || '/assets/images/Blog Loading.png',
+      featuredImage: `${baseUrl}${featuredImage.replace(/^\//, '')}`,
     };
   });
 
@@ -52,6 +56,10 @@ export function getBlogBySlug(slug: string): Blog | null {
     const fileContents = readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContents);
 
+    const baseUrl = import.meta.env.BASE_URL || '';
+    const defaultImage = '/assets/images/Blog Loading.png';
+    const featuredImage = data.featuredImage || defaultImage;
+
     return {
       title: data.title,
       description: data.description,
@@ -61,7 +69,7 @@ export function getBlogBySlug(slug: string): Blog | null {
       slug,
       category: data.category || 'General',
       tags: data.tags || [],
-      featuredImage: data.featuredImage || '/assets/images/Blog Loading.png',
+      featuredImage: `${baseUrl}${featuredImage.replace(/^\//, '')}`,
     };
   } catch (error) {
     return null;

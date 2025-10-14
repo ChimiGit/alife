@@ -89,7 +89,7 @@ export async function getAllSupportTeamMembers(): Promise<SupportTeamMember[]> {
       title: member.data.title,
       bio: member.data.bio,
       location: member.data.location,
-      image: member.data.image,
+      image: `${import.meta.env.BASE_URL}${member.data.image.replace(/^\//, '')}`,
       category: member.data.category,
       slug: member.id.replace('.md', ''), // Remove .md extension
       order: member.data.order,

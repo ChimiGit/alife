@@ -19,6 +19,7 @@ export async function getAllTeamMembers(): Promise<TeamMember[]> {
     const team = await getCollection('team');
     return team.map(member => ({
       ...member.data,
+      image: `${import.meta.env.BASE_URL}${member.data.image.replace(/^\//, '')}`,
       slug: member.slug,
     }));
   } catch (error) {
@@ -39,6 +40,7 @@ export async function getTeamMemberBySlug(
 
     return {
       ...member.data,
+      image: `${import.meta.env.BASE_URL}${member.data.image.replace(/^\//, '')}`,
       slug: member.slug,
     };
   } catch (error) {
