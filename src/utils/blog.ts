@@ -20,7 +20,7 @@ function getAllBlogs(): Blog[] {
     .filter(dirent => dirent.isFile() && dirent.name.endsWith('.md'))
     .map(dirent => dirent.name);
 
-  const baseUrl = import.meta.env.BASE_URL || '';
+  const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
 
   const blogs: Blog[] = blogFiles.map(filename => {
     const filePath = join(blogsDirectory, filename);
@@ -40,7 +40,7 @@ function getAllBlogs(): Blog[] {
       slug,
       category: data.category || 'General',
       tags: data.tags || [],
-      featuredImage: `${baseUrl}${featuredImage.replace(/^\//, '')}`,
+      featuredImage: `${baseUrl}${featuredImage}`,
     };
   });
 
@@ -56,7 +56,7 @@ export function getBlogBySlug(slug: string): Blog | null {
     const fileContents = readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContents);
 
-    const baseUrl = import.meta.env.BASE_URL || '';
+    const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
     const defaultImage = '/assets/images/Blog Loading.png';
     const featuredImage = data.featuredImage || defaultImage;
 
@@ -69,7 +69,7 @@ export function getBlogBySlug(slug: string): Blog | null {
       slug,
       category: data.category || 'General',
       tags: data.tags || [],
-      featuredImage: `${baseUrl}${featuredImage.replace(/^\//, '')}`,
+      featuredImage: `${baseUrl}${featuredImage}`,
     };
   } catch (error) {
     return null;

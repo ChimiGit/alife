@@ -83,14 +83,14 @@ export async function getAllSupportContent(): Promise<SupportContent[]> {
 export async function getAllSupportTeamMembers(): Promise<SupportTeamMember[]> {
   try {
     const supportTeam = await getCollection('support-team');
-    const baseUrl = import.meta.env.BASE_URL || '';
+    const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
 
     return supportTeam.map(member => ({
       name: member.data.name,
       title: member.data.title,
       bio: member.data.bio,
       location: member.data.location,
-      image: `${baseUrl}${member.data.image.replace(/^\//, '')}`,
+      image: `${baseUrl}${member.data.image}`,
       category: member.data.category,
       slug: member.id.replace('.md', ''), // Remove .md extension
       order: member.data.order,

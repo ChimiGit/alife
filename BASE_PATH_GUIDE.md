@@ -55,10 +55,12 @@ Also use `import.meta.env.BASE_URL`:
 
 ```typescript
 export async function getAllTeamMembers() {
-  const baseUrl = import.meta.env.BASE_URL || '';
+  // Remove trailing slash to avoid double slashes
+  const baseUrl = (import.meta.env.BASE_URL || '').replace(/\/$/, '');
   return members.map(member => ({
     ...member,
-    image: `${baseUrl}${member.image.replace(/^\//, '')}`,
+    // Keep the leading slash in the image path
+    image: `${baseUrl}${member.image}`,
   }));
 }
 ```
