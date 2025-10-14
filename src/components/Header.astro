@@ -1,0 +1,457 @@
+---
+// Header component for ALIFE website
+---
+
+<header class="font-['Inter',-apple-system,BlinkMacSystemFont,'Segoe_UI',Roboto,sans-serif] fixed top-0 left-0 right-0 z-50">
+
+    <!-- Main  header content -->
+    <div class="bg-white/20 backdrop-blur-md ">
+      <div class="max-w-6xl mx-auto pr-4 flex justify-between items-center min-h-12">
+      <!-- Logo section -->
+      <div class="flex items-center">
+        <a 
+          href={`${import.meta.env.BASE_URL}`} 
+          class="flex items-center cursor-pointer" 
+          aria-label="ALIFE - Artificial Life Institute"
+        >
+          <!-- Responsive wrapper -->
+          <div class="relative sm:w-[190px] sm:h-[28px] w-28 h-6 pl-4 sm:-pl-8">
+            <!-- Logo 1 -->
+            <img 
+              src={`${import.meta.env.BASE_URL}assets/logo/logo1.svg`} 
+              alt="ALIFE Logo 1" 
+              class="logo-1 absolute top-0 -left-3 sm:-left-7 z-10 w-full h-auto object-left"
+            />
+            <!-- Logo 2 (animated overlay) -->
+            <img 
+              src={`${import.meta.env.BASE_URL}assets/logo/logo2.svg`} 
+              alt="ALIFE Logo 2" 
+              class="logo-2 logo-slide absolute top-0 -left-3 sm:-left-7 z-20 w-full h-auto object-left transition-all duration-500 ease-in-out"
+            />
+          </div>
+        </a>
+      </div>
+
+      <!-- Desktop Navigation section -->
+      <nav class="hidden lg:flex items-center" role="navigation" aria-label="Main navigation">
+        <div class="px-6 py-3">
+          <ul class="flex list-none m-0 p-0 gap-8 items-center">
+            <li class="m-0">
+              <a href={`${import.meta.env.BASE_URL}about`} class="nav-link no-underline text-primary font-light text-sm transition-all duration-200 hover:text-primary/70 relative cursor-pointer" data-page="about">About Us</a>
+            </li>
+            <li class="m-0">
+              <a href={`${import.meta.env.BASE_URL}blog`} class="nav-link no-underline text-primary font-light text-sm transition-all duration-200 hover:text-primary/70 relative cursor-pointer" data-page="blog">Blog</a>
+            </li>
+            <li class="m-0">
+              <a href={`${import.meta.env.BASE_URL}people`} class="nav-link no-underline text-primary font-light text-sm transition-all duration-200 hover:text-primary/70 relative cursor-pointer" data-page="people">People</a>
+            </li>
+            <li class="m-0">
+              <a href={`${import.meta.env.BASE_URL}support`} class="nav-link no-underline text-primary font-light text-sm transition-all duration-200 hover:text-primary/70 relative cursor-pointer" data-page="support">Support Us</a>
+            </li>
+            <li class="m-0">
+              <a href={`${import.meta.env.BASE_URL}career`} class="nav-link no-underline text-primary font-light text-sm transition-all duration-200 hover:text-primary/70 relative cursor-pointer" data-page="career">Career</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <!-- Mobile Hamburger Menu Button -->
+      <button 
+        id="mobile-menu-button"
+        class="lg:hidden flex flex-col justify-center items-center w-8 h-8 space-y-1.5 text-primary hover:primary transition-colors duration-200 cursor-pointer"
+        aria-label="Toggle mobile menu"
+        aria-expanded="false"
+        style="position: relative; z-index: 100;"
+      >
+        <span class="block w-6 h-0.5 bg-current transition-all duration-300 transform" id="hamburger-line-1"></span>
+        <span class="block w-6 h-0.5 bg-current transition-all duration-300 transform" id="hamburger-line-2"></span>
+        <span class="block w-6 h-0.5 bg-current transition-all duration-300 transform" id="hamburger-line-3"></span>
+      </button>
+      </div>
+    </div>
+
+    <!-- Mobile Flyover Side Menu -->
+    <div 
+      id="mobile-menu" 
+      class="fixed top-0 right-0 w-80 h-full bg-white/10 backdrop-blur-xl shadow-2xl transform transition-all duration-500 ease-out z-50 lg:hidden"
+      style="box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1); transform: translateX(100%);"
+    >
+      <div class="flex flex-col h-full">
+        <!-- Mobile Menu Header -->
+        <div class="flex justify-end items-center p-6">
+          <button 
+            id="mobile-menu-close"
+            class="w-10 h-10 rounded-full hover:bg-white/20 flex items-center justify-center text-primary hover:text-primary transition-all duration-200 cursor-pointer"
+            aria-label="Close mobile menu"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="flex-1 p-6" role="navigation" aria-label="Mobile navigation">
+          <ul class="space-y-2">
+            <li>
+              <a href={`${import.meta.env.BASE_URL}about`} class="mobile-nav-link group flex items-center px-4 py-3 text-lg font-medium text-primary hover:text-primary hover:bg-white/5 transition-all duration-200 cursor-pointer" data-page="about">
+                <span class="w-2 h-2 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                About Us
+              </a>
+            </li>
+            <li>
+              <a href={`${import.meta.env.BASE_URL}blog`} class="mobile-nav-link group flex items-center px-4 py-3 text-lg font-medium text-primary hover:text-primary hover:bg-white/5 transition-all duration-200 cursor-pointer" data-page="blog">
+                <span class="w-2 h-2 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                Blog
+              </a>
+            </li>
+            <li>
+              <a href={`${import.meta.env.BASE_URL}people`} class="mobile-nav-link group flex items-center px-4 py-3 text-lg font-medium text-primary hover:text-primary hover:bg-white/5 transition-all duration-200 cursor-pointer" data-page="people">
+                <span class="w-2 h-2 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                People
+              </a>
+            </li>
+            <li>
+              <a href={`${import.meta.env.BASE_URL}support`} class="mobile-nav-link group flex items-center px-4 py-3 text-lg font-medium text-primary hover:text-primary hover:bg-white/5 transition-all duration-200 cursor-pointer" data-page="support">
+                <span class="w-2 h-2 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                Support Us
+              </a>
+            </li>
+            <li>
+              <a href={`${import.meta.env.BASE_URL}career`} class="mobile-nav-link group flex items-center px-4 py-3 text-lg font-medium text-primary hover:text-primary hover:bg-white/5 transition-all duration-200 cursor-pointer" data-page="career">
+                <span class="w-2 h-2 bg-primary rounded-full mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></span>
+                Career
+              </a>
+            </li>
+          </ul>
+          
+        </nav>
+      </div>
+    </div>
+
+    <!-- Mobile Menu Overlay -->
+    <div 
+      id="mobile-menu-overlay" 
+      class="fixed inset-0 bg-black/40 backdrop-blur-md z-40 lg:hidden opacity-0 pointer-events-none transition-all duration-500 ease-out"
+    ></div>
+</header>
+
+<style>
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #2E3192; /* primary color */
+    transition: width 0.3s ease;
+  }
+
+  .nav-link.active::after {
+    width: 0;
+  }
+
+  .nav-link.active {
+    color: #2E3192 !important; /* primary color */
+    font-weight: 600;
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  /* Mobile menu styles */
+  .mobile-nav-link.active {
+    color: #2E3192 !important;
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .mobile-nav-link.active .w-2 {
+    opacity: 1 !important;
+  }
+
+
+  /* Hamburger animation */
+  .hamburger-open #hamburger-line-1 {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger-open #hamburger-line-2 {
+    opacity: 0;
+  }
+
+  .hamburger-open #hamburger-line-3 {
+    transform: rotate(-45deg) translate(7px, -6px);
+  }
+
+  /* Flyover menu animation */
+  #mobile-menu {
+    transform: translateX(100%);
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #mobile-menu.menu-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Prevent body scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
+  }
+
+  /* Menu item hover effects */
+  .mobile-nav-link:hover {
+    transform: translateX(4px);
+  }
+
+
+  /* Ensure hamburger button is visible and clickable */
+  #mobile-menu-button {
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
+  }
+
+  /* Logo slide animation */
+  .logo-slide {
+    transform: translateX(100px);
+    opacity: 1;
+    z-index: 20;
+  }
+
+  .logo-slide.scrolled {
+    transform: translateX(0);
+    opacity: 0;
+    z-index: 30;
+  }
+  
+  /* Mobile - Position logo2 closer to logo1 */
+  @media (max-width: 640px) {
+    .logo-slide {
+      transform: translateX(65px);
+    }
+  }
+  
+  /* Medium screens - Moderate distance */
+  @media (max-width: 1024px) and (min-width: 641px) {
+    .logo-slide {
+      transform: translateX(60px);
+    }
+  }
+  
+  /* Logo sizing - Desktop size (keep original) */
+  .logo-1,
+  .logo-2 {
+    width: 189.92px;
+    height: 27.63px;
+  }
+  
+  /* Mobile - Smaller logo sizes */
+  @media (max-width: 640px) {
+    .logo-1,
+    .logo-2 {
+      width: 120px;
+      height: 17.2px;
+    }
+  }
+  
+  /* Medium screens - Slightly reduced */
+  @media (max-width: 1024px) and (min-width: 641px) {
+    .logo-1,
+    .logo-2 {
+      width: 160px;
+      height: 23.3px;
+    }
+  }
+</style>
+
+<script>
+
+  // Language switching functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuClose = document.getElementById('mobile-menu-close');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+
+
+    // Mobile menu functionality
+    const toggleMobileMenu = (open: boolean) => {
+      if (mobileMenu && mobileMenuOverlay && mobileMenuButton) {
+        if (open) {
+          mobileMenu.style.transform = 'translateX(0)';
+          mobileMenuOverlay.classList.remove('opacity-0', 'pointer-events-none');
+          mobileMenuButton.classList.add('hamburger-open');
+          mobileMenuButton.setAttribute('aria-expanded', 'true');
+          document.body.classList.add('menu-open');
+        } else {
+          mobileMenu.style.transform = 'translateX(100%)';
+          mobileMenuOverlay.classList.add('opacity-0', 'pointer-events-none');
+          mobileMenuButton.classList.remove('hamburger-open');
+          mobileMenuButton.setAttribute('aria-expanded', 'false');
+          document.body.classList.remove('menu-open');
+        }
+      }
+    };
+
+    // Open mobile menu
+    if (mobileMenuButton) {
+      mobileMenuButton.addEventListener('click', () => {
+        toggleMobileMenu(true);
+      });
+    } else {
+      // Mobile menu button not found
+    }
+
+    // Close mobile menu
+    if (mobileMenuClose) {
+      mobileMenuClose.addEventListener('click', () => {
+        toggleMobileMenu(false);
+      });
+    }
+
+    // Close mobile menu when clicking overlay
+    if (mobileMenuOverlay) {
+      mobileMenuOverlay.addEventListener('click', () => {
+        toggleMobileMenu(false);
+      });
+    }
+
+    // Close mobile menu when pressing Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu && mobileMenu.style.transform === 'translateX(0px)') {
+        toggleMobileMenu(false);
+      }
+    });
+
+    // Navigation active state functionality
+    const updateActiveNavigation = () => {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('.nav-link, .mobile-nav-link');
+      
+      navLinks.forEach((link) => {
+        const linkElement = link as HTMLElement;
+        const page = linkElement.getAttribute('data-page');
+        
+        // Remove active class from all links
+        linkElement.classList.remove('active');
+        
+        // Add active class to current page
+        if (currentPath === '/' && page === 'home') {
+          linkElement.classList.add('active');
+        } else if (currentPath.includes(`/${page}`)) {
+          linkElement.classList.add('active');
+        }
+      });
+    };
+
+
+    // Initialize active navigation styling
+    updateActiveNavigation();
+
+    // Close mobile menu when clicking on a navigation link
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    mobileNavLinks.forEach((link) => {
+      link.addEventListener('click', () => {
+        toggleMobileMenu(false);
+      });
+    });
+
+    // Detect individual page navigation for back navigation handling
+    const addNavigationDetection = () => {
+      const allInternalLinks = document.querySelectorAll('a[href^="/"]');
+
+      allInternalLinks.forEach((link) => {
+        const href = link.getAttribute('href');
+        if (href && !href.includes('mailto:') && !href.includes('#')) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = new URL(href, window.location.origin);
+            
+            // Check if this is navigation to an individual page (blog post, job, etc.)
+            const isIndividualPage = url.pathname.includes('/blog/') || url.pathname.includes('/jobs/');
+            const isJobPage = url.pathname.includes('/jobs/');
+            const isBlogPage = url.pathname.includes('/blog/');
+            
+            if (isIndividualPage) {
+              // Set flag for back navigation detection
+              sessionStorage.setItem('alife-back-navigation', 'true');
+              
+              // Set specific flags for different page types
+              if (isJobPage) {
+                sessionStorage.setItem('alife-from-job-page', 'true');
+              } else if (isBlogPage) {
+                sessionStorage.setItem('alife-from-blog-page', 'true');
+              }
+            }
+            
+            window.location.href = url.toString();
+          });
+        }
+      });
+    };
+
+    // Apply navigation detection after DOM is ready
+    setTimeout(addNavigationDetection, 100);
+
+    // Logo slide animation on scroll - only in sticky header
+    let lastScrollY = window.scrollY;
+    const logoSlide = document.querySelector('.logo-slide');
+    
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Only animate when header is sticky (scrolled down past initial position)
+      if (currentScrollY > 0) {
+        if (currentScrollY > lastScrollY && currentScrollY > 50) {
+          // Scrolling down - slide logo2 into logo1 (sticky state)
+          if (logoSlide) {
+            logoSlide.classList.add('scrolled');
+          }
+        } else if (currentScrollY === 0) {
+          // Only at the very top - slide logo2 back out
+          if (logoSlide) {
+            logoSlide.classList.remove('scrolled');
+          }
+        }
+      } else if (logoSlide) {
+        // At the very top - ensure logo2 is hidden
+        logoSlide.classList.remove('scrolled');
+      }
+      
+      lastScrollY = currentScrollY;
+    };
+
+    // Throttle scroll events for better performance
+    let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      scrollTimeout = setTimeout(handleScroll, 10);
+    });
+
+    // Handle browser back button navigation
+    window.addEventListener('popstate', () => {
+      // Set flag for back navigation detection
+      sessionStorage.setItem('alife-back-navigation', 'true');
+      
+      // Check if we're going back to career or blog page from individual pages
+      const { pathname: currentPath } = window.location;
+      const { referrer } = document;
+      
+      if (currentPath === '/career' && referrer && referrer.includes('/jobs/')) {
+        sessionStorage.setItem('alife-from-job-page', 'true');
+      } else if (currentPath === '/blog' && referrer && referrer.includes('/blog/')) {
+        sessionStorage.setItem('alife-from-blog-page', 'true');
+      }
+    });
+  });
+</script>

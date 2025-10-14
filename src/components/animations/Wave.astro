@@ -1,0 +1,147 @@
+---
+// Astro component - no props needed for this standalone component
+---
+
+<div class="relative w-full h-screen">
+  <canvas id="halftone-canvas" class="w-full h-screen" style="pointer-events: none;"></canvas>
+</div>
+
+
+<script>
+  let particleSize = 5;
+  let particleColor = "#ffffff";
+  let animationSpeed = 0.08;
+  let particleDensity = 6;
+  let sharpness = 1.0; // 0..1
+  let useAdditive = true;
+  
+  // Mobile responsive adjustments
+  const isMobile = () => window.innerWidth <= 768;
+  const getMobileMultiplier = () => isMobile() ? 0.6 : 1; // 60% size on mobile
+  const getMinVisibleSize = () => 3 * getMobileMultiplier(); // skip tiny particles
+  const MIN_WAVE_OFFSET = 0.15; // skip very faint phase
+
+  const canvas = document.getElementById('halftone-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+  
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let animationFrameId: number | undefined;
+  let time = 0;
+
+  const particles: Array<{
+    baseX: number;
+    baseY: number;
+    offsetX: number;
+    offsetY: number;
+    randomPhase: number;
+  }> = [];
+
+  const initializeParticles = () => {
+    particles.length = 0;
+    const mobileMultiplier = getMobileMultiplier();
+    const gridSize = particleDensity * mobileMultiplier;
+    const rows = Math.ceil(canvas.height / gridSize);
+    const cols = Math.ceil(canvas.width / gridSize);
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        particles.push({
+          baseX: x * gridSize,
+          baseY: y * gridSize,
+          offsetX: (Math.random() - 0.5) * 10,
+          offsetY: (Math.random() - 0.5) * 10,
+          randomPhase: Math.random() * Math.PI * 2,
+        });
+      }
+    }
+  };
+
+  const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initializeParticles();
+  };
+
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 255, g: 255, b: 255 };
+  };
+
+  const drawParticleWave = () => {
+    const rgb = hexToRgb(particleColor);
+    const mobileMultiplier = getMobileMultiplier();
+    // Shift wave center 50% downward relative to canvas height
+    const centerXRef = canvas.width / 2;
+    const centerYOffsetPercent = 0.5; // 50% downward
+    const centerYRef = canvas.height / 2 + canvas.height * centerYOffsetPercent;
+
+    // Compute max distance from shifted center to any canvas corner for normalization
+    const maxDistance = Math.max(
+      Math.hypot(centerXRef - 0, centerYRef - 0),
+      Math.hypot(centerXRef - canvas.width, centerYRef - 0),
+      Math.hypot(centerXRef - 0, centerYRef - canvas.height),
+      Math.hypot(centerXRef - canvas.width, centerYRef - canvas.height)
+    );
+
+    // Set blending mode for clearer/brighter overlaps
+    ctx!.globalCompositeOperation = useAdditive ? 'lighter' : 'source-over';
+
+    particles.forEach((particle) => {
+      const centerX = particle.baseX + particle.offsetX + Math.sin(time + particle.randomPhase) * 3;
+      const centerY = particle.baseY + particle.offsetY + Math.cos(time * 0.7 + particle.randomPhase) * 2;
+
+      const distanceFromCenter = Math.hypot(centerX - centerXRef, centerY - centerYRef);
+      const normalizedDistance = distanceFromCenter / maxDistance;
+
+      const waveOffset = Math.sin(normalizedDistance * 22.5 - time) * 0.5 + 0.5;
+      const size = particleSize * waveOffset * 0.8 * mobileMultiplier;
+
+      // Skip tiny/faint particles to remove small fading dots
+      if (waveOffset < MIN_WAVE_OFFSET || size < getMinVisibleSize()) {
+        return;
+      }
+
+      // Solid core for crispness
+      const coreRadius = (size / 2) * (0.3 + 0.55 * sharpness); // 30%..85% of radius
+      const baseAlpha = Math.min(1, waveOffset * (0.55 + 0.45 * sharpness));
+      if (coreRadius > 0) {
+        ctx!.beginPath();
+        ctx!.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
+        ctx!.fillStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${baseAlpha})`;
+        ctx!.fill();
+      }
+
+      // Crisp outline ring instead of soft fading halo
+      const outerRadius = size / 2;
+      if (outerRadius > coreRadius) {
+        const lineWidth = Math.max(1, outerRadius * (0.12 + 0.18 * sharpness));
+        const outlineAlpha = Math.min(1, baseAlpha * (0.85 + 0.15 * sharpness));
+        ctx!.beginPath();
+        ctx!.arc(centerX, centerY, outerRadius - lineWidth * 0.5, 0, Math.PI * 2);
+        ctx!.lineWidth = lineWidth;
+        ctx!.strokeStyle = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${outlineAlpha})`;
+        ctx!.stroke();
+      }
+    });
+  };
+
+  const animate = () => {
+    ctx!.clearRect(0, 0, canvas.width, canvas.height);
+    drawParticleWave();
+    time += animationSpeed;
+    animationFrameId = requestAnimationFrame(animate);
+  };
+
+
+  if (canvas && ctx) {
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    animate();
+  }
+</script>
