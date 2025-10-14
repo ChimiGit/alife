@@ -5,14 +5,10 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [
-    react({
-      jsxRuntime: 'automatic',
-    }),
-  ],
+  integrations: [react()],
   output: 'static',
-  site: 'https://alife.institute',
-  base: '/',
+  site: process.env.PUBLIC_SITE_URL || 'https://alife.institute',
+  base: process.env.PUBLIC_BASE_PATH || '',
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'ja'],
@@ -29,7 +25,7 @@ export default defineConfig({
     assets: 'assets',
   },
   vite: {
-    // @ts-ignore - Tailwind v4 compatibility issue
+    // @ts-expect-error - Tailwind v4 compatibility issue
     plugins: [tailwindcss()],
     build: {
       cssMinify: true,
