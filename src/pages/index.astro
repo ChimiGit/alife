@@ -51,18 +51,14 @@ import '../styles/global.css';
         height: 100vh !important;
         min-height: 100vh !important;
         z-index: 0;
-        /* Direct show state - no hiding/visibility changes needed for server-side */
-        visibility: visible;
-        opacity: 1;
-        display: block !important;
         /* Ensure coverage on all mobile devices including notched devices */
         min-width: 100vw;
         max-width: 100vw;
+        /* Hidden by default, shown by JS */
+        display: none;
       }
       
       .slider-background.show {
-        visibility: visible;
-        opacity: 1;
         display: block !important;
       }
       
