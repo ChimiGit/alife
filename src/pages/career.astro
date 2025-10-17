@@ -31,10 +31,10 @@ const jobs = await getAllJobs();
             </div>
             <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Symbiosis:</h3>
             <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              Rather than replacement,<br />
-              we seek harmonious<br />
-              coexistence between<br />
-              human and artificial<br />
+              Rather than replacement,<br class="hidden sm:block" />
+              we seek harmonious<br class="hidden sm:block" />
+              coexistence between<br class="hidden sm:block" />
+              human and artificial<br class="hidden sm:block" />
               intelligence
             </p>
           </div>
@@ -46,10 +46,10 @@ const jobs = await getAllJobs();
             </div>
             <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Emergence:</h3>
             <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              We believe in systems<br />
-              that explore without<br />
-              predetermined goals,<br />
-              discovering paths<br />
+              We believe in systems<br class="hidden sm:block" />
+              that explore without<br class="hidden sm:block" />
+              predetermined goals,<br class="hidden sm:block" />
+              discovering paths<br class="hidden sm:block" />
               no one planned
             </p>
           </div>
@@ -62,10 +62,10 @@ const jobs = await getAllJobs();
             </div>
             <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Evolution:</h3>
             <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              Our approach mimics<br />
-              nature's most creative<br />
-              force—continuous<br />
-              adaptation and<br />
+              Our approach mimics<br class="hidden sm:block" />
+              nature's most creative<br class="hidden sm:block" />
+              force—continuous<br class="hidden sm:block" />
+              adaptation and<br class="hidden sm:block" />
               innovation
             </p>
           </div>
@@ -79,10 +79,10 @@ const jobs = await getAllJobs();
             </div>
             <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Discovery:</h3>
             <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              We pioneer new approaches<br />
-              to AI that don't just<br />
-              optimize, but discover,<br />
-              surprise, and continuously<br />
+              We pioneer new approaches<br class="hidden sm:block" />
+              to AI that don't just<br class="hidden sm:block" />
+              optimize, but discover,<br class="hidden sm:block" />
+              surprise, and continuously<br class="hidden sm:block" />
               evolve
             </p>
           </div>
@@ -90,7 +90,7 @@ const jobs = await getAllJobs();
       </section>
 
       <!-- Divider Line -->
-      <div class="border-b border-primary mb-8 sm:mb-12 md:mb-16"></div>
+      <div class="border-b border-primary mb-8 sm:mb-12 md:mb-10"></div>
 
       <!-- Jobs Section -->
       <section>
@@ -99,7 +99,7 @@ const jobs = await getAllJobs();
             jobs.map((job: any, index: number) => {
               const htmlContent = job.content ? String(marked(job.content || '')) : '';
               return (
-                <div class="border-b border-primary pb-8 last:border-b-0">
+                <div class="border-b border-primary last:border-b-0">
                   <div class="flex justify-between items-start mb-6">
                     <div class="flex-1">
                       <h3 class="text-2xl font-medium text-primary mb-2" style="font-family: 'GT Alpina Fine', serif;">

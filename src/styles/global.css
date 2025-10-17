@@ -5,6 +5,19 @@ body {
   padding-top: 5rem; /* 80px to account for fixed header height */
 }
 
+/* Hero section spacing to prevent overlap with header */
+.hero-section-spacing {
+  /* On mobile, ensure content starts below the header */
+  top: 80px;
+}
+
+/* On larger screens, remove the top constraint for better layout */
+@media (min-width: 768px) {
+  .hero-section-spacing {
+    top: auto;
+  }
+}
+
 /* GT Alpina Fine font - defined in Layout.astro to use BASE_URL */
 
 /* Custom ALIFE colors */
