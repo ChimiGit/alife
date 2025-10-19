@@ -4,7 +4,7 @@
 
 <div class="fixed inset-0 w-full h-full overflow-hidden bg-[#FFB5A7]" style="font-family: 'Inter', sans-serif; position: fixed !important; width: 100vw !important; height: 100vh !important; min-height: 100vh !important;">
   <div class="grid h-full place-items-center overflow-hidden mobile-grid-container">
-      <div class="[grid-area:1/1] translate-x-[580px] md:translate-x-[1540px] translate-y-[90px] scale-[3] grid place-items-center transform-gpu origin-center mobile-images-center">
+      <div class="[grid-area:1/1] md:translate-x-[1000px] lg:translate-x-[1700px] xl:translate-x-[1540px] 2xl:translate-x-[2200px] translate-y-[90px] scale-[3] grid place-items-center transform-gpu origin-center mobile-images-center">
           <img src={`${import.meta.env.BASE_URL}/assets/images/layer-6.svg`} alt="back layer (inner)" class="[grid-area:1/1] z-[1] w-[23vw] h-auto [will-change:transform] transform-gpu" style="animation: rotateCW 50s linear infinite; transform-origin: center; transform: rotate(70deg) skew(25deg, 18deg);" />
           <img src={`${import.meta.env.BASE_URL}/assets/images/layer-5.svg`} alt="middle layer" class="[grid-area:1/1] z-[2] w-[27.1vw] h-auto [will-change:transform] transform-gpu" style="animation: rotateCCW 50s linear infinite; transform-origin: center; transform: rotate(70deg) skew(-22deg, 16deg);" />
           <img src={`${import.meta.env.BASE_URL}/assets/images/layer-4.svg`} alt="front layer (outer)" class="[grid-area:1/1] z-[3] w-[31.32vw] h-auto [will-change:transform] transform-gpu" style="animation: rotateCW 50s linear infinite; transform-origin: center; transform: rotate(70deg) skew(20deg, -22deg);" />
@@ -58,7 +58,6 @@
     }
     
     .mobile-images-center {
-      /* Keep original transform for desktop */
       transform: translateX(130px) translateY(90px) scale(3) !important;
       position: relative !important;
       top: auto !important;
@@ -68,17 +67,14 @@
 
   /* Mobile centering only for small screens */
   @media (max-width: 768px) {
-    /* Override the container to behave like a center-positioned flex container */
     .mobile-grid-container {
       display: flex !important;
       justify-content: center !important;
       align-items: center !important;
       position: relative !important;
     }
-    
-    /* Force image container to center absolutely with explicit reset */
+
     .mobile-images-center {
-      /* Override the translate-x-[1540px] with absolute centering and bigger scale */
       transform: translate(-30%, -50%) scale(3) !important;   
       position: absolute !important;
       top: 50% !important;
@@ -89,7 +85,7 @@
   /* Optimize for smaller screens */
   @media (max-width: 640px) {
     .mobile-images-center {
-      transform: translate(-30%, -50%) scale(2.5) !important;
+      transform: translate(125%, -50%) scale(3) !important;
     }
   }
 </style>
