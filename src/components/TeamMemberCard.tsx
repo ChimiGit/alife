@@ -41,7 +41,8 @@ export default function TeamMemberCard({
       >
         {member.name}
       </h4>
-      <p className="text-12px sm:text-sm text-primary">{member.title}</p>
+      <p className="text-12px sm:text-sm text-primary mb-1">{member.title}</p>
+      <p className="text-12px sm:text-sm text-primary">{member.bio}</p>
     </div>
   );
 }

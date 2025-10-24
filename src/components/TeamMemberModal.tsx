@@ -92,8 +92,11 @@ export default function TeamMemberModal({
                   >
                     {member.name}
                   </h2>
-                  <p className="text-lg text-gray-600 mb-6 font-medium">
+                  <p className="text-lg text-gray-600 mb-1 font-medium">
                     {member.title}
+                  </p>
+                  <p className="text-lg text-gray-600 mb-6 font-medium">
+                    {member.bio}
                   </p>
                 </div>
 
