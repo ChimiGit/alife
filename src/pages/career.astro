@@ -22,72 +22,73 @@ const jobs = await getAllJobs();
       </section>
 
       <!-- Philosophy Section -->
-      <section class="mb-12 sm:mb-16 md:mb-20">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          <div>
-            <!-- Mobile dots for Symbiosis (1 dot) -->
-            <div class="flex justify-start mb-2 sm:hidden">
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
+          <!-- Philosophy Section -->
+          <section class="mb-12 sm:mb-16 md:mb-20">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+              <div> <!-- Added sm:mb-16 to the div -->
+                <!-- Mobile dots for Symbiosis (1 dot) -->
+                <div class="flex justify-start mb-2 mt-4 sm:hidden">
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                </div>
+                <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Symbiosis:</h3>
+                <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
+                  Rather than replacement,<br class="hidden sm:block" />
+                  we seek harmonious<br class="hidden sm:block" />
+                  coexistence between<br class="hidden sm:block" />
+                  human and artificial<br class="hidden sm:block" />
+                  intelligence
+                </p>
+              </div>
+              <div>
+                <!-- Mobile dots for Emergence (2 dots) -->
+                <div class="flex justify-start gap-1 mb-2 mt-4 sm:hidden" >
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                </div>
+                <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Emergence:</h3>
+                <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
+                  We believe in systems<br class="hidden sm:block" />
+                  that explore without<br class="hidden sm:block" />
+                  predetermined goals,<br class="hidden sm:block" />
+                  discovering paths<br class="hidden sm:block" />
+                  no one planned
+                </p>
+              </div>
+              <div>
+                <!-- Mobile dots for Evolution (3 dots) -->
+                <div class="flex justify-start gap-1 mb-2 mt-4 sm:hidden">
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                </div>
+                <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Evolution:</h3>
+                <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
+                  Our approach mimics<br class="hidden sm:block" />
+                  nature's most creative<br class="hidden sm:block" />
+                  force—continuous<br class="hidden sm:block" />
+                  adaptation and<br class="hidden sm:block" />
+                  innovation
+                </p>
+              </div>
+              <div>
+                <!-- Mobile dots for Discovery (4 dots) -->
+                <div class="flex justify-start gap-1 mb-2 mt-4 sm:hidden">
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                  <div class="w-2 h-2 bg-primary rounded-full"></div>
+                </div>
+                <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Discovery:</h3>
+                <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
+                  We pioneer new approaches<br class="hidden sm:block" />
+                  to AI that don't just<br class="hidden sm:block" />
+                  optimize, but discover,<br class="hidden sm:block" />
+                  surprise, and continuously<br class="hidden sm:block" />
+                  evolve
+                </p>
+              </div>
             </div>
-            <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Symbiosis:</h3>
-            <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              Rather than replacement,<br class="hidden sm:block" />
-              we seek harmonious<br class="hidden sm:block" />
-              coexistence between<br class="hidden sm:block" />
-              human and artificial<br class="hidden sm:block" />
-              intelligence
-            </p>
-          </div>
-          <div>
-            <!-- Mobile dots for Emergence (2 dots) -->
-            <div class="flex justify-start gap-1 mb-2 sm:hidden">
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-            </div>
-            <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Emergence:</h3>
-            <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              We believe in systems<br class="hidden sm:block" />
-              that explore without<br class="hidden sm:block" />
-              predetermined goals,<br class="hidden sm:block" />
-              discovering paths<br class="hidden sm:block" />
-              no one planned
-            </p>
-          </div>
-          <div>
-            <!-- Mobile dots for Evolution (3 dots) -->
-            <div class="flex justify-start gap-1 mb-2 sm:hidden">
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-            </div>
-            <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Evolution:</h3>
-            <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              Our approach mimics<br class="hidden sm:block" />
-              nature's most creative<br class="hidden sm:block" />
-              force—continuous<br class="hidden sm:block" />
-              adaptation and<br class="hidden sm:block" />
-              innovation
-            </p>
-          </div>
-          <div>
-            <!-- Mobile dots for Discovery (4 dots) -->
-            <div class="flex justify-start gap-1 mb-2 sm:hidden">
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-              <div class="w-2 h-2 bg-primary rounded-full"></div>
-            </div>
-            <h3 class="text-base sm:text-lg font-medium text-primary mb-2 sm:mb-3 md:mb-4" style="font-family: 'GT Alpina Fine', serif;">Discovery:</h3>
-            <p class="text-sm sm:text-base text-primary leading-relaxed font-light" style="font-family: 'Inter', sans-serif;">
-              We pioneer new approaches<br class="hidden sm:block" />
-              to AI that don't just<br class="hidden sm:block" />
-              optimize, but discover,<br class="hidden sm:block" />
-              surprise, and continuously<br class="hidden sm:block" />
-              evolve
-            </p>
-          </div>
-        </div>
-      </section>
+          </section>
 
       <!-- Divider Line -->
       <div class="border-b border-primary mb-8 sm:mb-12 md:mb-10"></div>
