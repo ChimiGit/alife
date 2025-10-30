@@ -178,12 +178,19 @@
           p.update();
 
           const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
+          const particleX = xOffset + line.xOffset;
+          
+          // Frustum culling: skip particles outside visible area
+          if (particleX < -currentLineSpread || particleX > window.innerWidth + currentLineSpread) {
+            return;
+          }
+          
           // baseAlpha varies across the spread (0..1), keep a small minimum so particles remain visible
           const baseAlpha = Math.max(0.2, (xOffset + (currentLineSpread / 2)) / currentLineSpread);
           const finalAlpha = baseAlpha * (line.opacity ?? 1);
 
           ctx.beginPath();
-          ctx.arc(xOffset + line.xOffset, p.y, particleRadius * mobileMultiplier, 0, Math.PI * 2);
+          ctx.arc(particleX, p.y, particleRadius * mobileMultiplier, 0, Math.PI * 2);
           ctx.fillStyle = `rgba(28, 165, 0, ${finalAlpha})`;
           ctx.fill();
         });
@@ -194,8 +201,18 @@
         }
       }
 
-      requestAnimationFrame(animate);
+      // Pause animation when page is hidden to save resources
+      if (!document.hidden) {
+        requestAnimationFrame(animate);
+      }
     }
+
+    // Resume animation when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && lines.length > 0) {
+        animate();
+      }
+    });
 
     // Listen for window resize to make the canvas responsive
     window.addEventListener('resize', resizeCanvas);
