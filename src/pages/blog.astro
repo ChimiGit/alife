@@ -85,7 +85,7 @@ const contentData = Object.fromEntries(
             >
               <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {categoryData?.posts.map((post: any) => (
-                  <a href={`${import.meta.env.BASE_URL}blog/${post.slug}`} class="block group blog-card cursor-pointer">
+                  <a href={`${import.meta.env.BASE_URL}/blog/${post.slug}`} class="block group blog-card cursor-pointer">
                     <div class="mb-6">
                       <img 
                         src={`${import.meta.env.BASE_URL}/assets/images/image.png`}
