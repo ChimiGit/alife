@@ -6,7 +6,7 @@
   <canvas id="particleCanvas" class="absolute inset-0 w-full h-full z-5" style="touch-action: none; background-color: transparent; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges;"></canvas>
 
   <!-- Text Content -->
-  <section class="absolute bottom-20 md:bottom-16 left-0 right-0 mb-8 sm:mb-10 px-4 sm:px-6 z-[60] hero-section-spacing mt-8 md:mt-0">
+  <section class="absolute top-1/2 left-0 right-0 -translate-y-1/2 px-4 sm:px-6 z-[60]">
     <div class="max-w-6xl mx-auto px-4 sm:px-6">
       <h1
       class="text-6xl sm:text-64px md:text-64px lg:text-[96px] text-primary mt-10 md:mt-0"
@@ -124,8 +124,8 @@
       xOffset: isMobile() ? 0 : window.innerWidth / 2 + 40, // Start from left on mobile, center on desktop
       speed: baseLineSpeed * direction, // Direction: 1 for right, -1 for left
       particles,
-      // track fade-in state and reference start position
-      opacity: 0,
+      // Particles maintain constant opacity
+      opacity: 1,
       startX: isMobile() ? 0 : window.innerWidth / 2 + 40,
       };
     }
@@ -169,10 +169,8 @@
 
         const particlesToDraw = Math.floor(currentDensity);
         
-        // update fade-in opacity based on how far the line has traveled from its start
-        const defaultStartX = isMobile() ? 0 : window.innerWidth / 2 + 40;
-        const traveled = Math.abs(line.xOffset - (line.startX ?? defaultStartX));
-        line.opacity = Math.min(1, traveled / fadeInDistance);
+        // Particles maintain constant opacity - no fading
+        line.opacity = 1;
 
         line.particles.slice(0, particlesToDraw).forEach((p) => {
           p.update();
@@ -185,9 +183,8 @@
             return;
           }
           
-          // baseAlpha varies across the spread (0..1), keep a small minimum so particles remain visible
-          const baseAlpha = Math.max(0.2, (xOffset + (currentLineSpread / 2)) / currentLineSpread);
-          const finalAlpha = baseAlpha * (line.opacity ?? 1);
+          // Particles maintain full opacity - no gradient or fade effects
+          const finalAlpha = 1;
 
           ctx.beginPath();
           ctx.arc(particleX, p.y, particleRadius * mobileMultiplier, 0, Math.PI * 2);
