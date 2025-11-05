@@ -88,7 +88,10 @@ export default function TeamMemberModal({
                   {/* Name and Title */}
                   <h2
                     className="text-3xl font-medium text-black mb-2"
-                    style={{ fontFamily: "'GT Alpina Fine', serif" }}
+                    style={{
+                      fontFamily: "'GT Alpina Fine', serif",
+                      letterSpacing: '-0.05em',
+                    }}
                   >
                     {member.name}
                   </h2>

@@ -36,7 +36,7 @@ export default function TeamMemberCard({
         />
       </div>
       <h4
-        className="text-25px sm:text-lg font-medium text-primary mb-1"
+        className="text-25px sm:text-lg text-primary mb-1"
         style={{ fontFamily: "'GT Alpina Fine', serif" }}
       >
         {member.name}

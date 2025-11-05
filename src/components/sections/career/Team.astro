@@ -22,7 +22,7 @@ const teamCategories = await getAllTeamCategories();
               aria-selected={index === 0 ? 'true' : 'false'}
               data-target={`#${category.slug}-panel`}
               role="tab"
-              style="font-family: 'GT Alpina Fine', serif;"
+              style="font-family: 'GT Alpina Fine', serif; letter-spacing: -0.05em;"
             >
               {category.title}
             </button>
@@ -50,7 +50,7 @@ const teamCategories = await getAllTeamCategories();
                     <div class="w-48 h-48 mx-auto mb-4 overflow-hidden bg-gray-200 group-hover:shadow-lg transition-all duration-300">
                       <img src={member.image} alt={member.name} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     </div>
-                    <h4 class="text-xl font-medium text-primary mb-1" style="font-family: 'GT Alpina Fine', serif;">{member.name}</h4>
+                    <h4 class="text-xl font-medium text-primary mb-1" style="font-family: 'GT Alpina Fine', serif; letter-spacing: -0.05em;">{member.name}</h4>
                     <p class="text-primary font-medium mb-1">{member.title}</p>
                     <p class="text-xs text-primary mb-2">{member.bio}</p>
                   </div>
@@ -84,7 +84,7 @@ const teamCategories = await getAllTeamCategories();
               <img id="modal-image" src="" alt="" class="w-full h-full object-cover">
             </div>
             <div>
-              <h2 id="modal-name" class="text-3xl font-medium text-primary mb-2" style="font-family: 'GT Alpina Fine', serif;"></h2>
+              <h2 id="modal-name" class="text-3xl font-medium text-primary mb-2" style="font-family: 'GT Alpina Fine', serif; letter-spacing: -0.05em;"></h2>
               <p id="modal-title" class="text-xl text-primary font-medium mb-1"></p>
               <p id="modal-location" class="text-gray-600 mb-3"></p>
               <div id="modal-social" class="flex space-x-4">
