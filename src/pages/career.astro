@@ -102,7 +102,7 @@ const jobs = await getAllJobs();
                 <div class="border-b border-primary last:border-b-0">
                   <div class="flex justify-between items-start mb-6">
                     <div class="flex-1">
-                      <h3 class="text-2xl font-medium text-primary mb-2" style="font-family: 'GT Alpina Fine', serif;">
+                      <h3 class="text-2xl text-primary mb-2" style="font-family: 'GT Alpina Fine', serif;">
                         {job.title}
                       </h3>
                       <p class="text-primary text-16px font-medium mb-3">{job.location}</p>
@@ -141,8 +141,19 @@ const jobs = await getAllJobs();
                     <!-- Job Content from Markdown -->
                     <div class="job-markdown-content mb-12">
                       <div set:html={htmlContent
-                        .replace(/<h2>/g, '<h2 style="font-family: \'GT Alpina Fine\', sans-serif; color: #2E3192; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; margin-top: 3rem;">')
-                        .replace(/<h2 style="font-family: 'Inter', sans-serif; color: #2E3192; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; margin-top: 3rem; font-size: '20px'">About ALife<\/h2>/g, '<h2 style="font-family: \'Inter\', sans-serif; color: #2E3192; font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; margin-top: 0;">About ALife</h2>')
+                        .replace(/<h2([^>]*)>/gi, (match: string, attrs: string) => {
+                          // Remove existing font-family from style if present
+                          const cleanedAttrs = attrs.replace(/style="([^"]*)"/gi, (styleMatch: string, styleContent: string) => {
+                            const newStyle = styleContent.replace(/font-family:\s*[^;]+;?/gi, '').trim();
+                            return `style="${newStyle}; font-family: 'GT Alpina Fine', serif; color: #2E3192; font-size: 1.5rem; margin-bottom: 1rem; margin-top: 3rem;"`;
+                          });
+                          if (cleanedAttrs === attrs) {
+                            // No style attribute existed, add one
+                            return `<h2${attrs} style="font-family: 'GT Alpina Fine', serif; color: #2E3192; font-size: 1.5rem; margin-bottom: 1rem; margin-top: 3rem;">`;
+                          }
+                          return `<h2${cleanedAttrs}>`;
+                        })
+                        .replace(/<h2 style="font-family: 'Inter', sans-serif; color: #2E3192; font-size: 1.5rem; margin-bottom: 1rem; margin-top: 3rem; font-size: '20px'">About ALife<\/h2>/g, '<h2 style="font-family: \'Inter\', sans-serif; color: #2E3192; font-size: 1.5rem; margin-bottom: 1rem; margin-top: 0;">About ALife</h2>')
                         .replace(/<p>/g, '<p style="margin-bottom: 1rem; line-height: 1.7; color: #2E3192; font-family: \'Inter\', sans-serif; font-weight: 300;">')
                         .replace(/<ul>/g, '<ul style="margin-bottom: 3rem; padding-left: 0; list-style: none;">')
                         .replace(/<li>/g, '<li style="margin-bottom: 0.75rem; color: #2E3192; display: flex; align-items: flex-start; font-family: \'Inter\', sans-serif; font-weight: 300;"><span style="width: 8px; height: 8px; background-color: #2E3192; border-radius: 50%; margin-top: 8px; margin-right: 12px; flex-shrink: 0;"></span>')
@@ -155,7 +166,7 @@ const jobs = await getAllJobs();
 
                     <!-- Application Form -->
                     <section class="mb-12">
-                      <h3 class="text-40px font-medium text-primary mb-4" style="font-family: 'GT Alpina Fine', serif;">
+                      <h3 class="text-40px text-primary mb-4" style="font-family: 'GT Alpina Fine', serif; line-height: '90px', text-spacing: '-0.05em'">
                         Apply Now.
                       </h3>
                       <p class="text-primary text-16px mb-8">
