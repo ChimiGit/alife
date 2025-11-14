@@ -40,7 +40,7 @@
     "'Inter', sans-serif"
   }; line-height: 150%;`}
   >
-  We’re cultivating alternative pathways to intelligence through evolution itself—creating systems that don’t just optimize, but discover, surprise, and continuously evolve, just like the nature. This is where we pave a way for a future not engineered, but grown organically through bottom-up approaches where humans and artificial life forms collaborate toward digital democracy and a more diverse AI ecosystem.</p>
+  We're cultivating alternative pathways to intelligence through evolution itself—creating systems that don't just optimize, but discover, surprise, and continuously evolve, just like the nature. This is where we pave a way for a future not engineered, but grown organically through bottom-up approaches where humans and artificial life forms collaborate toward digital democracy and a more diverse AI ecosystem.</p>
     </div>
   </section>
 </div>
@@ -49,12 +49,12 @@
   document.addEventListener('DOMContentLoaded', () => {
     // Set up the canvas and other variables
     const canvas = document.getElementById('particleCanvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas?.getContext('2d');
+      
+    if (!ctx || !canvas) return;
     
-    if (!ctx || !canvas) return; // Exit if canvas context is not available
-    
-    let lines: any[] = [];
-    let animationFrameId: number | null = null;
+    let lines = [];
+    let animationFrameId = null;
     let isResizing = false;
     let lastTime = 0;
     const particleRadius = 1.7;
@@ -65,22 +65,21 @@
     
     // Mobile responsive adjustments
     const isMobile = () => window.innerWidth <= 768;
-    const getMobileMultiplier = () => isMobile() ? 0.6 : 1; // 60% size on mobile
+    const getMobileMultiplier = () => isMobile() ? 0.6 : 1;
 
     function resizeCanvas() {
         if (!ctx || !canvas) return;
         
         isResizing = true;
         
-        // Cancel any pending animation frame
         if (animationFrameId !== null) {
           cancelAnimationFrame(animationFrameId);
           animationFrameId = null;
         }
         
         const dpr = window.devicePixelRatio || 1;
-        const oldWidth = canvas.width / dpr;
-        const oldHeight = canvas.height / dpr;
+        const oldWidth = canvas.width > 0 ? canvas.width / dpr : window.innerWidth;
+        const oldHeight = canvas.height > 0 ? canvas.height / dpr : window.innerHeight;
         
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
@@ -88,24 +87,27 @@
         canvas.style.width = `${window.innerWidth}px`;
         canvas.style.height = `${window.innerHeight}px`;
 
-        // Adjust existing lines positions proportionally instead of recreating
-        const scaleX = window.innerWidth / oldWidth;
-        const scaleY = window.innerHeight / oldHeight;
-        
-        lines.forEach((line) => {
-          line.xOffset = line.xOffset * scaleX;
-          line.particles.forEach((p: any) => {
-            p.y = p.y * scaleY;
+        // Only scale existing lines if we have them and old dimensions are valid
+        if (lines.length > 0 && oldWidth > 0 && oldHeight > 0) {
+          const scaleX = window.innerWidth / oldWidth;
+          const scaleY = window.innerHeight / oldHeight;
+          
+          lines.forEach((line) => {
+            line.xOffset *= scaleX;
+            line.particles.forEach((p) => {
+              p.y *= scaleY;
+            });
           });
-        });
+        } else {
+          // Initialize lines if we don't have any
+          lines = [];
+        }
 
-        // Add or remove lines if needed based on new width
         const centerX = isMobile() ? 0 : window.innerWidth / 2 + 40;
         const mobileMultiplier = getMobileMultiplier();
         const adjustedLineSeparation = lineSeparation * mobileMultiplier;
         const numRequiredLines = Math.ceil(window.innerWidth / adjustedLineSeparation) + 2;
         
-        // Add lines if we don't have enough
         if (lines.length < numRequiredLines) {
           const linesToAdd = numRequiredLines - lines.length;
           for (let i = 0; i < linesToAdd; i++) {
@@ -116,15 +118,14 @@
           }
         }
         
-        // Remove excess lines (keep only what's needed + 2 buffer)
         if (lines.length > numRequiredLines + 2) {
           lines = lines.slice(0, numRequiredLines + 2);
         }
 
         isResizing = false;
-        lastTime = 0; // Reset time to prevent jump after resize
+        lastTime = 0;
         
-        // Resume animation
+        // Always restart animation after resize
         if (!document.hidden) {
           animationFrameId = requestAnimationFrame(animate);
         }
@@ -137,10 +138,11 @@
         this.speedY = speedY;
       }
 
-      // Update particle's position with gentle vertical movement
-      update() {
+      // MODIFIED: Accepts deltaFactor to ensure speed is constant regardless of FPS
+      update(deltaFactor) {
         if (!canvas) return;
-        this.y += this.speedY;
+        this.y += this.speedY * deltaFactor; // Apply delta factor to vertical movement
+        
         // Smooth boundary wrapping instead of bouncing
         if (this.y < 0) {
           this.y = canvas.height;
@@ -150,9 +152,8 @@
       }
     }
     
-    // Helper function to create a single line of particles with a random speed
-    function createLine(direction: number = 1) {
-      const particles: Particle[] = [];
+    function createLine(direction = 1) {
+      const particles = [];
       const mobileMultiplier = getMobileMultiplier();
       const adjustedDensity = Math.floor(baseDensity * mobileMultiplier);
       for (let j = 0; j < adjustedDensity; j++) {
@@ -163,37 +164,36 @@
       }
 
       return {
-      xOffset: isMobile() ? 0 : window.innerWidth / 2 + 40, // Start from left on mobile, center on desktop
-      speed: baseLineSpeed * direction, // Direction: 1 for right, -1 for left
+      xOffset: isMobile() ? 0 : window.innerWidth / 2 + 40,
+      speed: baseLineSpeed * direction,
       particles,
-      // Particles maintain constant opacity
       opacity: 1,
       startX: isMobile() ? 0 : window.innerWidth / 2 + 40,
       };
     }
 
-    // Main animation loop - using time-based animation for smoothness
-    function animate(currentTime: number = 0) {
-      if (!ctx || !canvas || isResizing) {
-        if (!document.hidden && !isResizing) {
-          animationFrameId = requestAnimationFrame(animate);
-        }
+    function animate(currentTime = 0) {
+      if (!ctx || !canvas) {
+        return;
+      }
+      
+      if (isResizing) {
+        // Wait for resize to complete
+        animationFrameId = requestAnimationFrame(animate);
         return;
       }
       
       // Calculate delta time for consistent speed across different frame rates
-      const deltaTime = lastTime ? currentTime - lastTime : 16.67; // Default to 60fps if first frame
+      const deltaTime = lastTime ? currentTime - lastTime : 16.67;
       lastTime = currentTime;
-      const normalizedDelta = Math.min(deltaTime / 16.67, 2); // Cap at 2x speed to prevent large jumps
+      const normalizedDelta = Math.min(deltaTime / 16.67, 2); // Delta factor (1.0 = 60fps)
       
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // Add new line when the last line has moved a specific distance
       const mobileMultiplier = getMobileMultiplier();
       const adjustedLineSeparation = lineSeparation * mobileMultiplier;
-      const startX = isMobile() ? 0 : window.innerWidth / 2 + 40; // Start from left on mobile, center on desktop
+      const startX = isMobile() ? 0 : window.innerWidth / 2 + 40;
       
-      // Smooth line creation based on distance, not frame count
       if (lines.length === 0) {
         lines.push(createLine(1));
       } else {
@@ -204,100 +204,88 @@
         }
       }
 
-      // Update and draw each line
       for (let i = lines.length - 1; i >= 0; i--) {
         const line = lines[i];
-        // Use delta time for smooth movement regardless of frame rate
+        // Smooth horizontal movement with delta factor
         line.xOffset += line.speed * mobileMultiplier * normalizedDelta;
 
-        // Calculate current spread and density based on distance from start position
-        const centerX = isMobile() ? 0 : window.innerWidth / 2 + 40; // Use left edge on mobile, center on desktop
-        const distanceFromCenter = Math.abs(line.xOffset - centerX);
-        const maxDistance = isMobile() ? window.innerWidth : window.innerWidth / 2; // Full width on mobile, half on desktop
-        const progress = distanceFromCenter / maxDistance;
+        const centerX = isMobile() ? 0 : window.innerWidth / 2 + 40;
         const currentLineSpread = baseLineSpread * mobileMultiplier;
         
-        // Make right side denser by adjusting density calculation (only on desktop)
-        const isRightSide = line.xOffset > centerX;
-        let densityMultiplier;
-        if (isMobile()) {
-          densityMultiplier = 1; // Full density on mobile
-        } else {
-          densityMultiplier = isRightSide ? 150 : 0; // Right-side bias on desktop
-        }
-        const currentDensity = isMobile() ? baseDensity * mobileMultiplier : baseDensity * (1 - progress) * densityMultiplier;
-
-        const particlesToDraw = Math.floor(currentDensity);
-        
-        // Particles maintain constant opacity - no fading
-        line.opacity = 1;
-
-        line.particles.slice(0, particlesToDraw).forEach((p: any) => {
-          // Smooth particle update using delta time
-          p.update();
-
-          const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
-          const particleX = xOffset + line.xOffset;
-          
-          // Frustum culling: skip particles outside visible area
-          if (particleX < -currentLineSpread || particleX > window.innerWidth + currentLineSpread) {
-            return;
+        // Calculate opacity fade for smooth transitions
+        let lineOpacity = 1;
+        if (!isMobile()) {
+          // Fade in on the left side
+          const fadeInStart = centerX - currentLineSpread;
+          const fadeInEnd = centerX;
+          if (line.xOffset < fadeInEnd) {
+            lineOpacity = Math.max(0, Math.min(1, (line.xOffset - fadeInStart) / (fadeInEnd - fadeInStart)));
           }
           
-          // Particles maintain full opacity - no gradient or fade effects
-          const finalAlpha = 1;
+          // Fade out on the right side
+          const fadeOutStart = window.innerWidth - currentLineSpread;
+          const fadeOutEnd = window.innerWidth;
+          if (line.xOffset > fadeOutStart) {
+            lineOpacity = Math.max(0, 1 - ((line.xOffset - fadeOutStart) / (fadeOutEnd - fadeOutStart)));
+          }
+        }
+        
+        // Only draw if there's some opacity
+        if (lineOpacity > 0.01) {
+          line.particles.forEach((p) => {
+            // Update particle position
+            p.update(normalizedDelta);
 
-          ctx.beginPath();
-          ctx.arc(particleX, p.y, particleRadius * mobileMultiplier, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(28, 165, 0, ${finalAlpha})`;
-          ctx.fill();
-        });
+            const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
+            const particleX = xOffset + line.xOffset;
+            
+            // Skip particles outside visible area
+            if (particleX < -currentLineSpread || particleX > window.innerWidth + currentLineSpread) {
+              return;
+            }
 
-        // Remove lines that have moved off-screen to the right
+            ctx.beginPath();
+            ctx.arc(particleX, p.y, particleRadius * mobileMultiplier, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(28, 165, 0, ${lineOpacity})`; 
+            ctx.fill();
+          });
+        }
+
+        // Remove lines that have moved off screen
         if (line.xOffset > window.innerWidth + currentLineSpread) {
           lines.splice(i, 1);
         }
       }
 
-      // Always request next frame for smooth continuous animation
       if (!document.hidden && !isResizing) {
         animationFrameId = requestAnimationFrame(animate);
       }
     }
 
-    // Resume animation when page becomes visible
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && lines.length > 0 && !isResizing) {
-        lastTime = 0; // Reset time to prevent jump
+        lastTime = 0;
         animationFrameId = requestAnimationFrame(animate);
       }
     });
 
-    // Throttle resize events for better performance
-    let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+    let resizeTimeout = null;
     window.addEventListener('resize', () => {
-      // Cancel any pending resize
       if (resizeTimeout) {
         clearTimeout(resizeTimeout);
       }
       
-      // Cancel animation during resize
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
       }
       
-      // Debounce resize handler
       resizeTimeout = setTimeout(() => {
         resizeCanvas();
-      }, 150); // Wait 150ms after resize stops
+      }, 150);
     });
 
     // Initial setup
     resizeCanvas();
-    // Start animation with initial frame
-    if (!document.hidden) {
-      animationFrameId = requestAnimationFrame(animate);
-    }
   });
 </script>
