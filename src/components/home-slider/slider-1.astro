@@ -162,14 +162,7 @@
     
     // Inline particle update for better performance
     function updateParticle(p, deltaFactor, canvasHeight) {
-      p.y += p.speedY * deltaFactor;
-      
-      // Smooth boundary wrapping
-      if (p.y < 0) {
-        p.y = canvasHeight;
-      } else if (p.y > canvasHeight) {
-        p.y = 0;
-      }
+      // No-op: particles are static to maximize smoothness
     }
     
     function createLine(direction = 1) {
@@ -224,7 +217,7 @@
       const canvasHeight = canvas.height;
       const canvasWidth = window.innerWidth;
       
-      // Create new lines if needed
+      // Create new lines as we advance, keeping consistent spacing from startX
       if (lines.length === 0) {
         lines.push(createLine(1));
       } else {
@@ -277,8 +270,7 @@
         for (let j = 0; j < particleCount; j++) {
           const p = particles[j];
           
-          // Inline update for better performance
-          updateParticle(p, normalizedDelta, canvasHeight);
+          // Particles are static; skip per-frame vertical updates
 
           const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
           const particleX = xOffset + line.xOffset;
@@ -294,9 +286,15 @@
           ctx.fill();
         }
 
-        // Remove off-screen lines
+        // Recycle off-screen lines instead of removing them to maintain cadence
         if (line.xOffset > canvasWidth + currentLineSpread) {
-          lines.splice(i, 1);
+          let maxOther = startX;
+          for (let k = 0; k < lines.length; k++) {
+            if (k !== i) {
+              maxOther = Math.max(maxOther, lines[k].xOffset);
+            }
+          }
+          line.xOffset = maxOther + adjustedLineSeparation;
         }
       }
 
