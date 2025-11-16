@@ -60,6 +60,8 @@
     let animationFrameId = null;
     let isResizing = false;
     let lastTime = 0;
+    let smoothedDelta = 1; // EMA-smoothed delta to ensure ultra-smooth motion
+    let isVisible = false; // Track if this slider is visible
     
     // Performance optimizations
     const isMobile = () => window.innerWidth <= 768;
@@ -148,9 +150,10 @@
 
         isResizing = false;
         lastTime = 0;
+        smoothedDelta = 1;
         
-        // Always restart animation after resize
-        if (!document.hidden) {
+        // Only restart animation after resize if visible
+        if (!document.hidden && isVisible) {
           animationFrameId = requestAnimationFrame(animate);
         }
     }
@@ -193,15 +196,26 @@
         return;
       }
       
+      // Don't animate if not visible
+      if (!isVisible) {
+        animationFrameId = null;
+        return;
+      }
+      
       if (isResizing) {
         animationFrameId = requestAnimationFrame(animate);
         return;
       }
       
-      // Calculate delta time for consistent speed
-      const deltaTime = lastTime ? currentTime - lastTime : 16.67;
+      // Calculate delta time with smoothing to avoid micro-stutters
+      const TARGET_FRAME_MS = 1000 / 60;
+      const deltaMs = lastTime ? (currentTime - lastTime) : TARGET_FRAME_MS;
       lastTime = currentTime;
-      const normalizedDelta = Math.min(deltaTime / 16.67, 2);
+      const frameDelta = deltaMs / TARGET_FRAME_MS;
+      // Exponential moving average to smooth out spikes
+      smoothedDelta = smoothedDelta * 0.9 + frameDelta * 0.1;
+      // Keep within a narrow band to avoid sudden accelerations/pauses
+      const normalizedDelta = Math.min(1.25, Math.max(0.75, smoothedDelta));
       
       // Use fillRect instead of clearRect - slightly faster
       ctx.fillStyle = '#FBEC61';
@@ -224,7 +238,11 @@
         const lastLine = lines[lines.length - 1];
         const distanceFromStart = lastLine.xOffset - startX;
         if (distanceFromStart >= adjustedLineSeparation || (lines.length < 3 && distanceFromStart >= 0)) {
-          lines.push(createLine(1));
+          const newLine = createLine(1);
+          // Start the new line one separation to the left of the last line
+          // so it glides in smoothly rather than popping at center
+          newLine.xOffset = (lastLine ? lastLine.xOffset : startX) - adjustedLineSeparation;
+          lines.push(newLine);
         }
       }
 
@@ -307,11 +325,58 @@
     }
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && lines.length > 0 && !isResizing) {
+      if (!document.hidden && isVisible && lines.length > 0 && !isResizing) {
         lastTime = 0;
-        animationFrameId = requestAnimationFrame(animate);
+        smoothedDelta = 1;
+        if (animationFrameId === null) {
+          animationFrameId = requestAnimationFrame(animate);
+        }
+      } else if (document.hidden && animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
       }
     });
+    
+    // Detect when this slider becomes visible/hidden
+    const sliderContainer = canvas.closest('.slider-background');
+    if (sliderContainer) {
+      // Use MutationObserver to watch for display style changes
+      const observer = new MutationObserver((mutations) => {
+        const computedStyle = window.getComputedStyle(sliderContainer);
+        const nowVisible = computedStyle.display !== 'none';
+        
+        if (nowVisible !== isVisible) {
+          isVisible = nowVisible;
+          
+          if (isVisible) {
+            // Slider became visible - start animation
+            lastTime = 0;
+            smoothedDelta = 1;
+            if (animationFrameId === null && !document.hidden) {
+              resizeCanvas();
+            }
+          } else {
+            // Slider became hidden - stop animation
+            if (animationFrameId !== null) {
+              cancelAnimationFrame(animationFrameId);
+              animationFrameId = null;
+            }
+          }
+        }
+      });
+      
+      observer.observe(sliderContainer, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+      
+      // Check initial visibility
+      const initialStyle = window.getComputedStyle(sliderContainer);
+      isVisible = initialStyle.display !== 'none';
+    } else {
+      // Fallback if not in a slider container
+      isVisible = true;
+    }
 
     let resizeTimeout = null;
     window.addEventListener('resize', () => {

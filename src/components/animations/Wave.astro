@@ -14,6 +14,7 @@
   let particleDensity = 6;
   let sharpness = 1.0; // 0..1
   let useAdditive = true;
+  let isVisible = false; // Track if this animation is visible
   
   // Mobile responsive adjustments
   const isMobile = () => window.innerWidth <= 768;
@@ -132,16 +133,78 @@
   };
 
   const animate = () => {
+    // Don't animate if not visible
+    if (!isVisible) {
+      animationFrameId = undefined;
+      return;
+    }
+    
     ctx!.clearRect(0, 0, canvas.width, canvas.height);
     drawParticleWave();
     time += animationSpeed;
-    animationFrameId = requestAnimationFrame(animate);
+    
+    if (!document.hidden) {
+      animationFrameId = requestAnimationFrame(animate);
+    }
   };
 
-
+  // Detect when this slider becomes visible/hidden
   if (canvas && ctx) {
+    const sliderContainer = canvas.closest('.slider-background');
+    
+    if (sliderContainer) {
+      // Use MutationObserver to watch for display style changes
+      const observer = new MutationObserver((mutations) => {
+        const computedStyle = window.getComputedStyle(sliderContainer);
+        const nowVisible = computedStyle.display !== 'none';
+        
+        if (nowVisible !== isVisible) {
+          isVisible = nowVisible;
+          
+          if (isVisible) {
+            // Slider became visible - start animation
+            if (animationFrameId === undefined && !document.hidden) {
+              resizeCanvas();
+              animate();
+            }
+          } else {
+            // Slider became hidden - stop animation
+            if (animationFrameId !== undefined) {
+              cancelAnimationFrame(animationFrameId);
+              animationFrameId = undefined;
+            }
+          }
+        }
+      });
+      
+      observer.observe(sliderContainer, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+      
+      // Check initial visibility
+      const initialStyle = window.getComputedStyle(sliderContainer);
+      isVisible = initialStyle.display !== 'none';
+    } else {
+      // Fallback if not in a slider container
+      isVisible = true;
+    }
+    
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    animate();
+    
+    // Visibility change handler
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && isVisible && animationFrameId === undefined) {
+        animate();
+      } else if (document.hidden && animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = undefined;
+      }
+    });
+    
+    if (isVisible) {
+      animate();
+    }
   }
 </script>
