@@ -10,11 +10,21 @@
 <script>
   let particleSize = 6;
   let particleColor = "#ffffff";
-  let animationSpeed = 0.08;
+  let animationSpeed = 0.02;
   let particleDensity = 6;
   let sharpness = 1.0; // 0..1
   let useAdditive = true;
   let isVisible = false; // Track if this animation is visible
+  const sliderId = 'slider3';
+  const getActiveSliderId = () => (window as any).__activeSliderId as string | null;
+  const setActiveSliderId = (id: string | null) => { (window as any).__activeSliderId = id; };
+  const isActive = () => getActiveSliderId() === sliderId;
+  const activateSelf = () => {
+    if (!isActive()) {
+      setActiveSliderId(sliderId);
+      window.dispatchEvent(new CustomEvent('slider-activate', { detail: { id: sliderId } }));
+    }
+  };
   
   // Mobile responsive adjustments
   const isMobile = () => window.innerWidth <= 768;
@@ -134,7 +144,7 @@
 
   const animate = () => {
     // Don't animate if not visible
-    if (!isVisible) {
+    if (!isVisible || !isActive()) {
       animationFrameId = undefined;
       return;
     }
@@ -154,7 +164,7 @@
     
     if (sliderContainer) {
       // Use MutationObserver to watch for display style changes
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver((_mutations) => {
         const computedStyle = window.getComputedStyle(sliderContainer);
         const nowVisible = computedStyle.display !== 'none';
         
@@ -164,15 +174,14 @@
           if (isVisible) {
             // Slider became visible - start animation
             if (animationFrameId === undefined && !document.hidden) {
+              activateSelf();
               resizeCanvas();
               animate();
             }
-          } else {
+          } else if (animationFrameId !== undefined) {
             // Slider became hidden - stop animation
-            if (animationFrameId !== undefined) {
-              cancelAnimationFrame(animationFrameId);
-              animationFrameId = undefined;
-            }
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = undefined;
           }
         }
       });
@@ -195,7 +204,7 @@
     
     // Visibility change handler
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && isVisible && animationFrameId === undefined) {
+      if (!document.hidden && isVisible && isActive() && animationFrameId === undefined) {
         animate();
       } else if (document.hidden && animationFrameId !== undefined) {
         cancelAnimationFrame(animationFrameId);
@@ -203,8 +212,25 @@
       }
     });
     
+    // Listen for global slider activation and pause if not active
+    window.addEventListener('slider-activate', (e: any) => {
+      const activatedId = e?.detail?.id as string | undefined;
+      if (activatedId !== sliderId) {
+        if (animationFrameId !== undefined) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = undefined;
+        }
+      } else if (isVisible && !document.hidden && animationFrameId === undefined) {
+        // We just became active - ensure animation is running
+        animate();
+      }
+    });
+    
     if (isVisible) {
-      animate();
+      activateSelf();
+      if (isActive() && !document.hidden) {
+        animate();
+      }
     }
   }
 </script>

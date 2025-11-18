@@ -46,7 +46,29 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  // --- Configuration Constants ---
+  // All dynamic values are defined here for easy access and modification
+  const CONFIG = {
+    // Particle settings
+    PARTICLE_RADIUS_MOBILE: 1.5,
+    PARTICLE_RADIUS_DESKTOP: 1.7,
+    BASE_LINE_SPEED: 2.0,
+    BASE_LINE_SPREAD_MOBILE: 120,
+    BASE_LINE_SPREAD_DESKTOP: 200,
+    BASE_DENSITY: 2000,
+    LINE_SEPARATION_MOBILE: 150,
+    LINE_SEPARATION_DESKTOP: 210,
+    MOBILE_MULTIPLIER: 0.6,
+    DESKTOP_MULTIPLIER: 1,
+    // Device detection thresholds
+    MOBILE_BREAKPOINT: 768,
+    LOW_END_MEMORY_THRESHOLD: 4, // GB
+    LOW_END_CORES_THRESHOLD: 2,
+    // Performance settings
+    MAX_DPR: 2, // Maximum device pixel ratio
+  };
+
+  const initSlider1 = () => {
     // Set up the canvas and other variables
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas?.getContext('2d', { 
@@ -62,13 +84,23 @@
     let lastTime = 0;
     let smoothedDelta = 1; // EMA-smoothed delta to ensure ultra-smooth motion
     let isVisible = false; // Track if this slider is visible
+    const sliderId = 'slider1';
+    const getActiveSliderId = () => (window).__activeSliderId as string | null;
+    const setActiveSliderId = (id: string | null) => { (window).__activeSliderId = id; };
+    const isActive = () => getActiveSliderId() === sliderId;
+    const activateSelf = () => {
+      if (!isActive()) {
+        setActiveSliderId(sliderId);
+        window.dispatchEvent(new CustomEvent('slider-activate', { detail: { id: sliderId } }));
+      }
+    };
     
     // Performance optimizations
-    const isMobile = () => window.innerWidth <= 768;
+    const isMobile = () => window.innerWidth <= CONFIG.MOBILE_BREAKPOINT;
     const isLowEnd = () => {
       const memory = navigator.deviceMemory;
       const cores = navigator.hardwareConcurrency;
-      return (memory && memory < 4) || (cores && cores <= 2);
+      return (memory && memory < CONFIG.LOW_END_MEMORY_THRESHOLD) || (cores && cores <= CONFIG.LOW_END_CORES_THRESHOLD);
     };
     
     // Adaptive settings based on device capability
@@ -77,15 +109,13 @@
       const lowEnd = isLowEnd();
       
       return {
-        particleRadius: mobile ? 1.5 : 1.7,
-        baseLineSpeed: 2.0,
-        baseLineSpread: mobile ? 120 : 200,
-        // Keep original particle count as requested
-        baseDensity: 2000,
-        lineSeparation: mobile ? 150 : 210,
-        mobileMultiplier: mobile ? 0.6 : 1,
-        // Lower DPR on low-end devices for better performance
-        dpr: lowEnd ? 1 : Math.min(window.devicePixelRatio || 1, 2)
+        particleRadius: mobile ? CONFIG.PARTICLE_RADIUS_MOBILE : CONFIG.PARTICLE_RADIUS_DESKTOP,
+        baseLineSpeed: CONFIG.BASE_LINE_SPEED,
+        baseLineSpread: mobile ? CONFIG.BASE_LINE_SPREAD_MOBILE : CONFIG.BASE_LINE_SPREAD_DESKTOP,
+        baseDensity: CONFIG.BASE_DENSITY,
+        lineSeparation: mobile ? CONFIG.LINE_SEPARATION_MOBILE : CONFIG.LINE_SEPARATION_DESKTOP,
+        mobileMultiplier: mobile ? CONFIG.MOBILE_MULTIPLIER : CONFIG.DESKTOP_MULTIPLIER,
+        dpr: lowEnd ? 1 : Math.min(window.devicePixelRatio || 1, CONFIG.MAX_DPR)
       };
     };
     
@@ -103,7 +133,7 @@
         
         // Refresh settings on resize
         settings = getSettings();
-        const dpr = settings.dpr;
+        const { dpr } = settings;
         
         const oldWidth = canvas.width > 0 ? canvas.width / dpr : window.innerWidth;
         const oldHeight = canvas.height > 0 ? canvas.height / dpr : window.innerHeight;
@@ -163,11 +193,6 @@
       return { relativeX, y, speedY };
     }
     
-    // Inline particle update for better performance
-    function updateParticle(p, deltaFactor, canvasHeight) {
-      // No-op: particles are static to maximize smoothness
-    }
-    
     function createLine(direction = 1) {
       const particles = [];
       const adjustedDensity = Math.floor(settings.baseDensity * settings.mobileMultiplier);
@@ -197,7 +222,7 @@
       }
       
       // Don't animate if not visible
-      if (!isVisible) {
+      if (!isVisible || !isActive()) {
         animationFrameId = null;
         return;
       }
@@ -223,12 +248,11 @@
 
       // Cache frequently used values
       const mobile = isMobile();
-      const mobileMultiplier = settings.mobileMultiplier;
+      const { mobileMultiplier } = settings;
       const adjustedLineSeparation = settings.lineSeparation * mobileMultiplier;
       const startX = mobile ? 0 : window.innerWidth / 2 + 40;
       const currentLineSpread = settings.baseLineSpread * mobileMultiplier;
       const particleSize = settings.particleRadius * mobileMultiplier;
-      const canvasHeight = canvas.height;
       const canvasWidth = window.innerWidth;
       
       // Create new lines as we advance, keeping consistent spacing from startX
@@ -270,49 +294,46 @@
           }
         }
         
-        // Skip invisible lines
+        // Skip invisible lines or render otherwise (avoid continue)
         if (lineOpacity <= 0.01) {
           if (line.xOffset > canvasWidth + currentLineSpread) {
             lines.splice(i, 1);
           }
-          continue;
-        }
-
-        // Set alpha for this line
-        ctx.globalAlpha = lineOpacity;
-        
-        const particles = line.particles;
-        const particleCount = particles.length;
-        
-        // Render particles - optimized loop
-        for (let j = 0; j < particleCount; j++) {
-          const p = particles[j];
+        } else {
+          // Set alpha for this line
+          ctx.globalAlpha = lineOpacity;
           
-          // Particles are static; skip per-frame vertical updates
-
-          const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
-          const particleX = xOffset + line.xOffset;
+          const { particles } = line;
+          const particleCount = particles.length;
           
-          // Early skip for off-screen particles
-          if (particleX < -currentLineSpread || particleX > canvasWidth + currentLineSpread) {
-            continue;
-          }
+          // Render particles - optimized loop
+          for (let j = 0; j < particleCount; j++) {
+            const p = particles[j];
+            
+            // Particles are static; skip per-frame vertical updates
 
-          // Use arc for circles - fastest way to draw circles
-          ctx.beginPath();
-          ctx.arc(particleX, p.y, particleSize, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
-        // Recycle off-screen lines instead of removing them to maintain cadence
-        if (line.xOffset > canvasWidth + currentLineSpread) {
-          let maxOther = startX;
-          for (let k = 0; k < lines.length; k++) {
-            if (k !== i) {
-              maxOther = Math.max(maxOther, lines[k].xOffset);
+            const xOffset = (p.relativeX * currentLineSpread) - (currentLineSpread / 2);
+            const particleX = xOffset + line.xOffset;
+            
+            // Draw only when on-screen (avoid continue)
+            if (particleX >= -currentLineSpread && particleX <= canvasWidth + currentLineSpread) {
+              // Use arc for circles - fastest way to draw circles
+              ctx.beginPath();
+              ctx.arc(particleX, p.y, particleSize, 0, Math.PI * 2);
+              ctx.fill();
             }
           }
-          line.xOffset = maxOther + adjustedLineSeparation;
+
+          // Recycle off-screen lines instead of removing them to maintain cadence
+          if (line.xOffset > canvasWidth + currentLineSpread) {
+            let maxOther = startX;
+            for (let k = 0; k < lines.length; k++) {
+              if (k !== i) {
+                maxOther = Math.max(maxOther, lines[k].xOffset);
+              }
+            }
+            line.xOffset = maxOther + adjustedLineSeparation;
+          }
         }
       }
 
@@ -325,7 +346,7 @@
     }
 
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && isVisible && lines.length > 0 && !isResizing) {
+      if (!document.hidden && isVisible && isActive() && lines.length > 0 && !isResizing) {
         lastTime = 0;
         smoothedDelta = 1;
         if (animationFrameId === null) {
@@ -341,7 +362,7 @@
     const sliderContainer = canvas.closest('.slider-background');
     if (sliderContainer) {
       // Use MutationObserver to watch for display style changes
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver((_mutations) => {
         const computedStyle = window.getComputedStyle(sliderContainer);
         const nowVisible = computedStyle.display !== 'none';
         
@@ -353,14 +374,13 @@
             lastTime = 0;
             smoothedDelta = 1;
             if (animationFrameId === null && !document.hidden) {
+              activateSelf();
               resizeCanvas();
             }
-          } else {
+          } else if (animationFrameId !== null) {
             // Slider became hidden - stop animation
-            if (animationFrameId !== null) {
-              cancelAnimationFrame(animationFrameId);
-              animationFrameId = null;
-            }
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
           }
         }
       });
@@ -396,5 +416,31 @@
 
     // Initial setup
     resizeCanvas();
-  });
+    // Listen for global slider activation and pause if not active
+    window.addEventListener('slider-activate', (e: any) => {
+      const activatedId = e?.detail?.id as string | undefined;
+      if (activatedId !== sliderId) {
+        if (animationFrameId !== null) {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = null;
+        }
+      } else if (isVisible && !document.hidden) {
+        // We just became active - ensure animation is running
+        if (animationFrameId === null) {
+          animationFrameId = requestAnimationFrame(animate);
+        }
+      }
+    });
+    if (isVisible) {
+      activateSelf();
+      if (isActive() && !document.hidden) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlider1);
+  } else {
+    initSlider1();
+  }
 </script>

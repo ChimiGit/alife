@@ -46,7 +46,31 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  // --- Configuration Constants ---
+  // All dynamic values are defined here for easy access and modification
+  const CONFIG = {
+    // Rectangle/Cell settings
+    RECTANGLE_WIDTH: 300,
+    RECTANGLE_HEIGHT: 150,
+    SHEAR_X: -0.5,
+    // Particle settings
+    PARTICLE_SIZE: 3, // Increased from 2 to 3 (50% larger)
+    PARTICLE_COUNT_PER_RECTANGLE: 1000,
+    GRADIENT_DENSITY_FACTOR_Y: 2,
+    // Animation settings
+    DAMPING: 1.0,
+    INITIAL_SPEED: 0.15, // Increased from 0.1 to 0.15 (50% faster)
+    SCROLL_SPEED: 0.7, // Increased from 0.5 to 0.7 (40% faster)
+    // Color settings
+    SOLID_COLOR: "#FFB5A7",
+    PARTICLE_COLOR_RGBA: "rgba(100, 150, 200, 0.9)",
+    // Layout settings
+    CENTER_GAP: 150,
+    CLIP_OFFSET_LEFT: 200, // Shift clipping left to show more on the left side
+    INIT_MARGIN: 1, // Initial margin for particles within cells
+  };
+
+  const initSlider2 = () => {
     // Set up the canvas
     const canvas = document.getElementById('designCanvas');
     const ctx = canvas.getContext('2d');
@@ -54,27 +78,20 @@
     if (!ctx || !canvas) return; // Exit if canvas context is not available
     
     let isVisible = false; // Track if this slider is visible
+    const sliderId = 'slider2';
+    const getActiveSliderId = () => (window).__activeSliderId as string | null;
+    const setActiveSliderId = (id: string | null) => { (window).__activeSliderId = id; };
+    const isActive = () => getActiveSliderId() === sliderId;
+    const activateSelf = () => {
+      if (!isActive()) {
+        setActiveSliderId(sliderId);
+        window.dispatchEvent(new CustomEvent('slider-activate', { detail: { id: sliderId } }));
+      }
+    };
     
-    // --- Configuration ---
+    // --- Runtime Variables ---
     let currentCanvasWidth = 0;
-    let currentCanvasHeight = 0;
-
-    const RECTANGLE_WIDTH = 300;
-    const RECTANGLE_HEIGHT = 150;
-    const SHEAR_X = -0.5;
-    const PARTICLE_SIZE = 3; // Increased from 2 to 3 (50% larger)
-    const DAMPING = 1.0;
-    const INITIAL_SPEED = 0.15; // Increased from 0.1 to 0.15 (50% faster)
-    const SCROLL_SPEED = 0.7; // Increased from 0.5 to 0.7 (40% faster)
-
-    const SOLID_COLOR = "#FFB5A7";
-    const PARTICLE_COLOR_RGBA = "rgba(100, 150, 200, 0.9)";
-
-    const PARTICLE_COUNT_PER_RECTANGLE = 1000;
-    const GRADIENT_DENSITY_FACTOR_Y = 2;
-
-    const CENTER_GAP = 150;
-    const CLIP_OFFSET_LEFT = 200; // Shift clipping left to show more on the left side 
+    let currentCanvasHeight = 0; 
 
     let allParticles = [];
     let allCells = [];
@@ -82,7 +99,6 @@
     let numRows = 0;
     let numCols = 0;
     let effectiveCellHeight = 0;
-    let X_START_GLOBAL = 0; // used for exact wrap positioning
 
     // --- Setup and Initialization ---
 
@@ -110,15 +126,14 @@
       allCells = [];
       allParticles = [];
 
-      const effectiveCellWidth = RECTANGLE_WIDTH;
-      effectiveCellHeight = RECTANGLE_HEIGHT;
+      const effectiveCellWidth = CONFIG.RECTANGLE_WIDTH;
+      effectiveCellHeight = CONFIG.RECTANGLE_HEIGHT;
 
       const X_MIDPOINT = currentCanvasWidth / 2;
-      const LEFTWARD_EXTENSION = Math.abs(SHEAR_X * RECTANGLE_HEIGHT);
+      const LEFTWARD_EXTENSION = Math.abs(CONFIG.SHEAR_X * CONFIG.RECTANGLE_HEIGHT);
 
       // Start a bit further to the right
-      const X_START = X_MIDPOINT + LEFTWARD_EXTENSION + CENTER_GAP;
-      X_START_GLOBAL = X_START;
+      const X_START = X_MIDPOINT + LEFTWARD_EXTENSION + CONFIG.CENTER_GAP;
 
       const displayWidthToCover = currentCanvasWidth - X_START;
       numCols = Math.ceil(displayWidthToCover / effectiveCellWidth) + 2;
@@ -128,13 +143,12 @@
       gridTotalHeight = numRows * effectiveCellHeight;
 
       let particleId = 0;
-      const INIT_MARGIN = 1;
-      const effectiveW = RECTANGLE_WIDTH - 2 * INIT_MARGIN;
-      const effectiveH = RECTANGLE_HEIGHT - 2 * INIT_MARGIN;
+      const effectiveW = CONFIG.RECTANGLE_WIDTH - 2 * CONFIG.INIT_MARGIN;
+      const effectiveH = CONFIG.RECTANGLE_HEIGHT - 2 * CONFIG.INIT_MARGIN;
 
       // Start row iteration from 0 to minimize initial overlap, relying on the loop's size and wrap logic
       for (let row = 0; row < numRows; row++) {
-        const rowShiftX = row * SHEAR_X * RECTANGLE_HEIGHT;
+        const rowShiftX = row * CONFIG.SHEAR_X * CONFIG.RECTANGLE_HEIGHT;
 
         for (let col = 0; col < numCols; col++) {
           const cellX = X_START + col * effectiveCellWidth + rowShiftX;
@@ -147,9 +161,9 @@
           const cell = {
             x: cellX,
             y: cellY,
-            width: RECTANGLE_WIDTH,
-            height: RECTANGLE_HEIGHT,
-            shear: SHEAR_X,
+            width: CONFIG.RECTANGLE_WIDTH,
+            height: CONFIG.RECTANGLE_HEIGHT,
+            shear: CONFIG.SHEAR_X,
             isParticle: isParticleCell,
             particles: [],
             originalRow: row,
@@ -158,19 +172,19 @@
           allCells.push(cell);
 
           if (isParticleCell) {
-            for (let i = 0; i < PARTICLE_COUNT_PER_RECTANGLE; i++) {
+            for (let i = 0; i < CONFIG.PARTICLE_COUNT_PER_RECTANGLE; i++) {
               let randX = Math.random();
-              let localX = randX * effectiveW + INIT_MARGIN;
+              let localX = randX * effectiveW + CONFIG.INIT_MARGIN;
               let randY = Math.random();
-              let biasedY = Math.pow(randY, GRADIENT_DENSITY_FACTOR_Y);
-              let localY = biasedY * effectiveH + INIT_MARGIN;
+              let biasedY = Math.pow(randY, CONFIG.GRADIENT_DENSITY_FACTOR_Y);
+              let localY = biasedY * effectiveH + CONFIG.INIT_MARGIN;
 
-              let transformedXLocal = localX + SHEAR_X * localY;
+              let transformedXLocal = localX + CONFIG.SHEAR_X * localY;
               let transformedX = cellX + transformedXLocal;
               let transformedY = cellY + localY;
 
               const angle = Math.random() * Math.PI * 2;
-              const speed = (Math.random() * 0.5 + 0.5) * INITIAL_SPEED;
+              const speed = (Math.random() * 0.5 + 0.5) * CONFIG.INITIAL_SPEED;
 
               const particle = {
                 x: transformedX,
@@ -193,8 +207,8 @@
     // --- Core Animation Logic ---
 
     function updateCells() {
-      const yShift = SCROLL_SPEED;
-      const xShiftDueToShear = yShift * SHEAR_X;
+      const yShift = CONFIG.SCROLL_SPEED;
+      const xShiftDueToShear = yShift * CONFIG.SHEAR_X;
 
       allParticles.forEach((p) => {
         p.y += yShift;
@@ -208,7 +222,7 @@
         if (cell.y > currentCanvasHeight) { 
           // Move up exactly one grid cycle to maintain seamless wrapping
           cell.y -= gridTotalHeight;
-          cell.x -= numRows * SHEAR_X * RECTANGLE_HEIGHT;
+          cell.x -= numRows * CONFIG.SHEAR_X * CONFIG.RECTANGLE_HEIGHT;
 
           if (cell.isParticle) {
             cell.particles.forEach((p) => {
@@ -228,8 +242,8 @@
         const W = cell.width;
         const H = cell.height;
 
-        p.vx *= DAMPING;
-        p.vy *= DAMPING;
+        p.vx *= CONFIG.DAMPING;
+        p.vy *= CONFIG.DAMPING;
         p.localX += p.vx;
         p.localY += p.vy;
 
@@ -239,8 +253,8 @@
           p.localY = 0;
           p.vy = -p.vy + Math.random() * perturbation;
           didCollide = true;
-        } else if (p.localY + PARTICLE_SIZE > H) {
-          p.localY = H - PARTICLE_SIZE;
+        } else if (p.localY + CONFIG.PARTICLE_SIZE > H) {
+          p.localY = H - CONFIG.PARTICLE_SIZE;
           p.vy = -p.vy - Math.random() * perturbation;
           didCollide = true;
         }
@@ -249,8 +263,8 @@
           p.localX = 0;
           p.vx = -p.vx + Math.random() * perturbation;
           didCollide = true;
-        } else if (p.localX + PARTICLE_SIZE > W) {
-          p.localX = W - PARTICLE_SIZE;
+        } else if (p.localX + CONFIG.PARTICLE_SIZE > W) {
+          p.localX = W - CONFIG.PARTICLE_SIZE;
           p.vx = -p.vx - Math.random() * perturbation;
           didCollide = true;
         }
@@ -270,7 +284,7 @@
       ctx.clearRect(0, 0, currentCanvasWidth, currentCanvasHeight);
 
       const X_MIDPOINT = currentCanvasWidth / 2;
-      const X_CLIP_START = X_MIDPOINT - CLIP_OFFSET_LEFT;
+      const X_CLIP_START = X_MIDPOINT - CONFIG.CLIP_OFFSET_LEFT;
 
       ctx.save();
       ctx.beginPath();
@@ -285,12 +299,12 @@
           if (cellRight < X_CLIP_START || cellLeft > currentCanvasWidth) {
             return;
           }
-          drawCellRectangle(cell.x, cell.y, cell.width, cell.height, cell.shear, SOLID_COLOR);
+          drawCellRectangle(cell.x, cell.y, cell.width, cell.height, cell.shear, CONFIG.SOLID_COLOR);
         }
       });
 
-      ctx.fillStyle = PARTICLE_COLOR_RGBA;
-      const particleRadius = PARTICLE_SIZE / 2;
+      ctx.fillStyle = CONFIG.PARTICLE_COLOR_RGBA;
+      const particleRadius = CONFIG.PARTICLE_SIZE / 2;
       allParticles.forEach((p) => {
         // Expanded bounds check to account for particle radius - ensures full visibility when zoomed
         if (p.x >= X_CLIP_START - particleRadius && p.x < currentCanvasWidth + particleRadius && p.y > -particleRadius && p.y < currentCanvasHeight + particleRadius) {
@@ -320,7 +334,7 @@
       if (!ctx) return;
       
       // Don't animate if not visible
-      if (!isVisible) {
+      if (!isVisible || !isActive()) {
         window.animationFrameId = null;
         return;
       }
@@ -337,7 +351,7 @@
 
     // Resume animation when page becomes visible
     document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && isVisible && !window.animationFrameId) {
+      if (!document.hidden && isVisible && isActive() && !window.animationFrameId) {
         animate();
       } else if (document.hidden && window.animationFrameId) {
         cancelAnimationFrame(window.animationFrameId);
@@ -349,7 +363,7 @@
     const sliderContainer = canvas.closest('.slider-background');
     if (sliderContainer) {
       // Use MutationObserver to watch for display style changes
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver((_mutations) => {
         const computedStyle = window.getComputedStyle(sliderContainer);
         const nowVisible = computedStyle.display !== 'none';
         
@@ -359,14 +373,13 @@
           if (isVisible) {
             // Slider became visible - start animation
             if (!window.animationFrameId && !document.hidden) {
+              activateSelf();
               resizeCanvas();
             }
-          } else {
+          } else if (window.animationFrameId) {
             // Slider became hidden - stop animation
-            if (window.animationFrameId) {
-              cancelAnimationFrame(window.animationFrameId);
-              window.animationFrameId = null;
-            }
+            cancelAnimationFrame(window.animationFrameId);
+            window.animationFrameId = null;
           }
         }
       });
@@ -389,5 +402,29 @@
 
     // Initial setup
     resizeCanvas();
-  });
+    // Listen for global slider activation and pause if not active
+    window.addEventListener('slider-activate', (e: any) => {
+      const activatedId = e?.detail?.id as string | undefined;
+      if (activatedId !== sliderId) {
+        if (window.animationFrameId) {
+          cancelAnimationFrame(window.animationFrameId);
+          window.animationFrameId = null;
+        }
+      } else if (isVisible && !document.hidden && !window.animationFrameId) {
+        // We just became the active slider - start animating
+        animate();
+      }
+    });
+    if (isVisible) {
+      activateSelf();
+      if (isActive() && !document.hidden && !window.animationFrameId) {
+        animate();
+      }
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSlider2);
+  } else {
+    initSlider2();
+  }
 </script>
